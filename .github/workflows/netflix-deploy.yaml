@@ -6,7 +6,7 @@ on:
 jobs:
   build-analyze-scan:
     name: Build
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,20 +17,5 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: trivy scan
-        run: trivy fs --format table -o fs.html .
-
-      - name: Docker build and push
-        run: |
-          #run commands to build and push docker images
-          docker build --build-arg TMDB_V3_API_KEY=7f9ecf6732609def64dddfd04c9095cf -t netflix .
-          docker tag netflix ifedi/netflix:latest
-          
-        env:
-          DOCKER_CLI_ACI: 1
-
-      - name: Trivy Image scan
-        run: trivy image --format table -o image.html ifedim/netflix:latest
 
 
