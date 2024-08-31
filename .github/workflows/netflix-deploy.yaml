@@ -18,5 +18,30 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-    
+
+      - name: Trivy FS scan
+        run: trivy fs --format table -o fs.html .    
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build --build-arg TMDB_V3_API_KEY=7f9ecf6732609def64dddfd04c9095cf -t netflix .
+          docker tag netflix ifedim/netflix:latest
+      - name: Trivy Image scan
+        run: trivy image --format table -o image.html ifedim/netflix:latest
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker Image
+        run: |
+          docker push ifedim/netflix:latest
 
